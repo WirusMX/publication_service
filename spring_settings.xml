@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" destroy-method="close">
+        <property name="driverClassName" value="org.sqlite.JDBC"/>
+        <property name="url" value="jdbc:sqlite:settings.db"/>
+    </bean>
+
+    <bean id="crlLoader" class="com.wirusmx.publicationservice.model.loader.CrlsDBLoader">
+        <constructor-arg name="jdbcTemplate">
+            <bean class="org.springframework.jdbc.core.JdbcTemplate">
+                <constructor-arg ref="dataSource"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="ftpLoader" class="com.wirusmx.publicationservice.model.loader.FtpsDBLoader">
+        <constructor-arg name="jdbcTemplate">
+            <bean class="org.springframework.jdbc.core.JdbcTemplate">
+                <constructor-arg ref="dataSource"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="view" class="com.wirusmx.publicationservice.view.View">
+        <property name="title" value="Publication Service 1.0"/>
+        <property name="size">
+            <bean class="java.awt.Dimension">
+                <constructor-arg name="width" value="800"/>
+                <constructor-arg name="height" value="600"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="model" class="com.wirusmx.publicationservice.model.Model">
+        <constructor-arg name="crlsListLoader" ref="crlLoader"/>
+        <constructor-arg name="ftpsListLoader" ref="ftpLoader"/>
+    </bean>
+
+    <bean id="controller" class="com.wirusmx.publicationservice.controller.Controller">
+        <constructor-arg name="model" ref="model"/>
+        <constructor-arg name="view" ref="view"/>
+    </bean>
+</beans>
